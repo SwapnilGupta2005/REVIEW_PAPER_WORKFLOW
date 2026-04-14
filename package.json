@@ -1,0 +1,14 @@
+{
+  "name": "review-paper-workflow",
+  "version": "1.0.0",
+  "description": "AI Agent Workflow for generating university-level review papers",
+  "main": "templates/generate_docx_template.js",
+  "dependencies": {
+    "docx": "^9.0.0"
+  },
+  "scripts": {
+    "generate": "node templates/generate_docx_template.js"
+  },
+  "keywords": ["review-paper", "docx", "ai-workflow", "academic"],
+  "license": "MIT"
+}
