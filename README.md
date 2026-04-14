@@ -4,11 +4,25 @@ A complete, reusable AI-agent workflow for generating university-level 30-paper 
 
 ---
 
+## ⚠ Academic Integrity
+
+**This tool generates AI-assisted academic content. Before submitting any output:**
+- Check your institution's policy on AI-assisted writing.
+- Disclose AI use if required by your professor, department, or journal.
+- Verify all citations independently — AI-generated references may contain errors.
+- Use this tool for drafting and learning, not for submitting work that must be wholly your own.
+
+The authors of this workflow are not responsible for any academic misconduct arising from its misuse.
+
+---
+
 ## Repository Structure
 
 ```
 REVIEW_PAPER_WORKFLOW/
 ├── README.md                          ← You are here
+├── run.sh / run.bat                   ← CLI Wrapper to guide you through prompts
+├── config.md                          ← Central variables for the wrapper scripts
 ├── workflow/
 │   └── agent_workflow_prompts.md      ← The main 4-stage pipeline prompts
 ├── skills/
@@ -18,7 +32,8 @@ REVIEW_PAPER_WORKFLOW/
 │       └── SKILL.md                   ← Instructs AI to create .docx files
 ├── templates/
 │   ├── review_paper_format_guide.md   ← Strict university formatting rules
-│   └── generate_docx_template.js      ← Reusable Node.js DOCX generator
+│   ├── generate_docx_template.js      ← Reusable Node.js DOCX script
+│   └── generate_docx_template.py      ← Reusable Python DOCX script
 └── examples/
     └── CG_REVIEW_CONTENT.md           ← Sample output (30-paper VFI review)
 ```
@@ -27,83 +42,76 @@ REVIEW_PAPER_WORKFLOW/
 
 ## How It Works
 
-The workflow is broken into **4 sequential stages**, each with a ready-to-paste prompt:
+The workflow is broken into **4 sequential stages**, handled interactively by the CLI wrapper or via a copy-paste prompts file:
 
 | Stage | What It Does | Output |
 |---|---|---|
-| **1. Research** | AI searches the web for 30 peer-reviewed papers on your topic | `papers_list.md` |
-| **2. Draft & Humanize** | AI writes the full paper in batches (Intro → Lit Review → Conclusion) | `REVIEW_CONTENT.md` |
-| **3. Assemble** | AI merges all sections into a single, format-compliant markdown file | Final `REVIEW_CONTENT.md` |
-| **4. DOCX Export** | AI generates a Node.js script; you run one command to get a `.docx` | `REVIEW_PAPER.docx` |
+| **0. Validate** | Checks if the topic is feasible for 30 papers | Validation |
+| **1. Research** | Finds peer-reviewed papers with logical fallbacks | `papers_list.md` |
+| **2. Draft & Assemble** | Writes the paper, humanizes it, and audits citations | Final `REVIEW_CONTENT.md` |
+| **3. DOCX Export** | Generates the document using Node, Python, or Pandoc | `REVIEW_PAPER.docx` |
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-- **Node.js** (v18+) installed on your machine
-- **npm** (comes with Node.js)
-- An AI coding agent (Claude Code, Gemini in IDE, ChatGPT, etc.)
-
-### Step-by-Step
-
-1. **Clone this repo**
+### Step 1: Clone and Configure
+1. Clone this repo:
    ```bash
    git clone https://github.com/SwapnilGupta2005/REVIEW_PAPER_WORKFLOW.git
    cd REVIEW_PAPER_WORKFLOW
    ```
+2. Open `config.md` (or the top of `agent_workflow_prompts.md`) and customize your topic, author names, and university.
 
-2. **Install the DOCX library**
-   ```bash
-   npm install docx
-   ```
+### Step 2: Run the Workflow
+The easiest way is to use the interactive CLI wrapper:
 
-3. **Open `workflow/agent_workflow_prompts.md`** and follow the 4 stages sequentially. Copy-paste each prompt into your AI agent.
+- **Windows:** Run `run.bat`
+- **Mac/Linux:** Run `./run.sh`
 
-4. **When you reach Stage 4**, the AI will generate a `generate_docx.js` script. Run it:
-   ```bash
-   node generate_docx.js
-   ```
+The script will read your config and print exact prompts to copy-paste into your AI agent (like Claude Code or ChatGPT) one step at a time. 
 
-5. **Open your generated `.docx`** file in Microsoft Word or Google Docs.
+Alternatively, open `workflow/agent_workflow_prompts.md` and manually copy the prompts sequentially.
 
 ---
 
-## Customization
+## Export Options (Stage 3)
 
-### Change the Topic
-In Stage 1 of `agent_workflow_prompts.md`, replace `[INSERT YOUR TOPIC HERE]` with your research topic. Examples:
-- "Game Engines in Neuroscience: Leveraging Modern Graphics Pipelines for BCI Feedback"
-- "Deep Learning Approaches to Medical Image Segmentation"
-- "Blockchain Applications in Supply Chain Management"
+The workflow supports three different ways to generate your final `.docx`. Choose the one you already have installed:
 
-### Change the Authors
-In Stage 2a, update the author block with your own names, departments, and emails.
+### Option A: Node.js (Recommended)
+Requires [Node.js](https://nodejs.org/) installed.
+```bash
+npm install docx
+node generate_docx.js
+```
 
-### Change the Professor
-Replace "Assistant Professor Goldi Soni" with your own professor's details.
+### Option B: Python
+Requires [Python](https://www.python.org/) installed.
+```bash
+pip install python-docx
+python generate_docx.py
+```
+
+### Option C: Pandoc
+Requires [Pandoc](https://pandoc.org/) installed. (The AI will provide the exact command, usually something like):
+```bash
+pandoc REVIEW_CONTENT.md -o REVIEW_PAPER.docx
+```
 
 ---
 
 ## Skills Explained
 
 ### Humanizer (`skills/humanizer/SKILL.md`)
-Based on Wikipedia's "Signs of AI Writing" guide. It detects and fixes 29 categories of AI-generated text patterns including:
+Based on Wikipedia's "Signs of AI Writing" guide. It detects and fixes 29 categories of AI-generated text patterns (with exact Before/After rules for each) including:
 - Inflated significance language
 - Promotional tone
-- Superficial "-ing" analyses
-- Em dash overuse
-- Rule of three
 - Sycophantic tone
-- And 23 more patterns
+- Verbose filler phrases
 
 ### DOCX Generator (`skills/docx_generator/SKILL.md`)
-Instructs the AI on exactly how to create, read, and edit `.docx` files using the `docx` npm library, including:
-- Page sizing and margins
-- Tables with proper borders
-- Headers, footers, and page numbers
-- Images, hyperlinks, and footnotes
-- Tracked changes and comments
+Instructs the AI on exactly how to create `.docx` files using the `docx` library, enforcing borders, fonts, margins, and layouts.
 
 ---
 
@@ -136,5 +144,4 @@ MIT — Use freely for academic and personal projects.
 ## Credits
 
 - **Humanizer Skill**: Based on [Wikipedia: Signs of AI Writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
-- **DOCX Skill**: Based on the `docx` npm library
 - **Workflow Design**: Built during a Computer Graphics review paper project at Amity University Raipur

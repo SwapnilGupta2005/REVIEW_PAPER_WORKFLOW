@@ -4,6 +4,27 @@
 
 ---
 
+## CONFIG
+
+Before you begin, replace the bracketed values below with your specific details. Then, whenever a prompt says `{VARIABLE_NAME}`, use the value you set here.
+
+```text
+TOPIC: [INSERT YOUR TOPIC HERE]
+PAPER_COUNT: 30
+AUTHOR_1_NAME: [Your Name]
+AUTHOR_1_DEPT: [Your Department]
+AUTHOR_1_EMAIL: [your@email.com]
+AUTHOR_2_NAME: [Co-author Name]
+AUTHOR_2_DEPT: [Co-author Department]
+AUTHOR_2_EMAIL: [coauthor@email.com]
+PROFESSOR_NAME: [Professor Name]
+PROFESSOR_TITLE: Assistant Professor
+UNIVERSITY: [Your University Name]
+OUTPUT_FILENAME: REVIEW_PAPER
+```
+
+---
+
 ## Before You Begin
 
 Make sure the AI has access to these files in your working directory:
@@ -13,20 +34,46 @@ Make sure the AI has access to these files in your working directory:
 
 ---
 
-## Stage 1: Research & Discovery
+## Stage 0: Input Validation
 
-**Goal:** Build a verified list of 30 peer-reviewed research papers.
+**Goal:** Verify topic feasibility before wasting time on research.
 
 **Copy this prompt:**
 
 ```text
-I am writing an academic review paper on the topic:
-"[INSERT YOUR TOPIC HERE]"
+I want to write a review paper on the topic: "{TOPIC}"
+Target number of papers: {PAPER_COUNT}
 
-Your task is to search the web and find exactly 30 unique, peer-reviewed research papers related to this topic. Each paper must meet these criteria:
+Before we begin the actual research, please validate this topic:
+1. Confirm if this topic is specific enough to yield {PAPER_COUNT} legitimate peer-reviewed papers (not too broad like "AI generally" or too narrow).
+2. Run a quick search/estimation of paper availability on Google Scholar, Semantic Scholar, or arXiv.
+3. Suggest 2-3 refined topic phrasings if the original seems problematic.
+4. If the topic looks good and likely to yield {PAPER_COUNT} strong papers, say "TOPIC VALIDATED". Otherwise, warn me.
+
+Do not proceed to research until I confirm the final topic.
+```
+
+---
+
+## Stage 1: Research & Discovery
+
+**Goal:** Build a verified list of peer-reviewed research papers.
+
+**Copy this prompt:**
+
+```text
+The topic is validated.
+
+Your task is to search the web and find exactly {PAPER_COUNT} unique, peer-reviewed research papers related to this topic: "{TOPIC}". Each paper must meet these criteria:
 - Published in 2017 or later
 - From a credible venue (IEEE, ACM, CVPR, ICCV, ECCV, NeurIPS, AAAI, Springer, Elsevier journals, or equivalent)
 - Directly relevant to the topic
+
+If you cannot find {PAPER_COUNT} peer-reviewed papers on the exact topic, do the following in order:
+1. Try 3 alternative phrasings of the topic.
+2. Expand the search to include conference papers, theses, and preprints (arXiv, Semantic Scholar).
+3. If still under {PAPER_COUNT}, notify me with the count found and ask permission to either (a) lower the target, (b) broaden the topic, or (c) include grey literature.
+Do NOT silently pad the list with loosely related papers.
 
 For each paper, provide the following in a clean markdown table:
 | # | Title | Authors | Year | Venue | URL |
@@ -35,9 +82,7 @@ Save the output as `papers_list.md`.
 
 IMPORTANT RULES:
 - No duplicate papers
-- No preprints unless from a well-known research group
 - Verify that each paper actually exists before including it
-- If you cannot find 30 papers on the exact topic, broaden slightly to closely related subtopics but note which ones are broadened
 
 Stop and show me the list for review before proceeding.
 ```
@@ -46,7 +91,7 @@ Stop and show me the list for review before proceeding.
 
 ## Stage 2: Drafting & Humanizing
 
-Since 30 summaries exceed what most AI models can generate reliably in a single pass, this stage is split into 4 sub-prompts. Run them in order.
+Since generating {PAPER_COUNT} summaries exceeds what most AI models can do reliably in one pass, this stage is split into sub-prompts. Run them in order.
 
 ### Stage 2a: Title, Abstract, Introduction, Objective
 
@@ -55,13 +100,13 @@ Please read these local files before starting:
 - `templates/review_paper_format_guide.md` (formatting rules)
 - `skills/humanizer/SKILL.md` (writing style — remove all AI-sounding patterns)
 
-Using the topic "[INSERT TOPIC HERE]" and the data in `papers_list.md`, generate the following sections:
+Using the topic "{TOPIC}" and the data in `papers_list.md`, generate the following sections:
 
 1. **Title** — Under 12 words, Title Case, no subtitle, no colon
-2. **Author Block** — Use these placeholders:
-   - Student A (Department of Computer Science, [University Name], [email])
-   - Student B (Department of Computer Science, [University Name], [email])
-   - [Professor Name] (Assistant Professor, [University Name], [email])
+2. **Author Block** — Use these values:
+   - {AUTHOR_1_NAME} ({AUTHOR_1_DEPT}, {UNIVERSITY}, {AUTHOR_1_EMAIL})
+   - {AUTHOR_2_NAME} ({AUTHOR_2_DEPT}, {UNIVERSITY}, {AUTHOR_2_EMAIL})
+   - {PROFESSOR_NAME} ({PROFESSOR_TITLE}, {UNIVERSITY}, {PROFESSOR_EMAIL})
 3. **Abstract** — Follow the strict 6-point structure from the format guide. Use the bold inline label with em-dash: "Abstract —". Length: 200-300 words.
 4. **Keywords** — 5-7 keywords, Title Case, comma-separated, bold label with em-dash
 5. **Section I: Introduction** — 3 paragraphs of background. No bullet points.
@@ -94,48 +139,19 @@ STRICT RULES (from the format guide):
 Append these 10 paragraphs to `REVIEW_CONTENT.md`.
 ```
 
-### Stage 2c: Literature Review — Papers 11-20
+*(Note: Depending on {PAPER_COUNT}, repeat the above prompt for papers 11-20, 21-30, adjusting the numbers in the prompt, until all papers are summarized.)*
 
-```text
-Continue building `REVIEW_CONTENT.md`.
-
-Generate literature review paragraphs for papers 11 through 20 from `papers_list.md`.
-
-Follow the EXACT same rules as the previous batch:
-- 3-4 sentences per paragraph
-- Citation [N] at the end in bold
-- No author names in body
-- No bullets
-- Humanizer skill applied
-
-Append these 10 paragraphs to `REVIEW_CONTENT.md`.
-```
-
-### Stage 2d: Literature Review — Papers 21-30
-
-```text
-Continue building `REVIEW_CONTENT.md`.
-
-Generate the final literature review paragraphs for papers 21 through 30 from `papers_list.md`.
-
-Follow the EXACT same rules as the previous batches.
-
-Append these 10 paragraphs to `REVIEW_CONTENT.md`.
-```
-
----
-
-## Stage 3: Synthesis & Assembly
+### Stage 2c: Synthesis & Assembly
 
 ```text
 Continue building `REVIEW_CONTENT.md`. Generate the remaining sections:
 
-1. **Section IV: Comparison of 30 Published Research Papers**
+1. **Section IV: Comparison of {PAPER_COUNT} Published Research Papers**
    - Write ONE introductory paragraph explaining why comparison is needed
    - Create a 7-column table with EXACTLY 5 rows of data
    - Columns: S.No | Title of RP | Author Name | Year | Objective | Methodology | Conclusion/Result
    - Author format: "Last et al. (Year)" for 3+ authors
-   - Select 5 papers that represent DIFFERENT techniques from the 30 reviewed
+   - Select 5 papers that represent DIFFERENT techniques from the {PAPER_COUNT} reviewed
    - Add a table caption ABOVE the table: "Table 1. Comparative Summary of Selected Published Research Papers"
 
 2. **Section V: Conclusion** — Exactly 3 paragraphs:
@@ -147,28 +163,67 @@ Continue building `REVIEW_CONTENT.md`. Generate the remaining sections:
 3. **Section VI: Future Scope** — 1 paragraph, approximately 150 words
    - Mention emerging technologies, application domains, hardware improvements, open problems
 
-4. **References** — All 30 papers in strict APA format
+4. **References** — All papers in strict APA format
    - Label: "References" (no Roman numeral)
-   - Numbered [1] through [30] in square brackets
+   - Numbered [1] through [{PAPER_COUNT}] in square brackets
    - Use proper APA citation format
 
-Apply the humanizer skill to all prose sections.
+Apply the humanizer skill to all prose sections. Append everything to `REVIEW_CONTENT.md`.
+Then, merge all sections in order to form the final, complete `REVIEW_CONTENT.md`.
+```
 
-Append everything to `REVIEW_CONTENT.md`.
+### Stage 2d: Citation Audit
+
+**Goal:** Verify academic integrity before locking the document.
+
+**Copy this prompt:**
+
+```text
+Review every in-text citation in the drafted `REVIEW_CONTENT.md`. For each [N] reference:
+- Confirm it matches an entry in the `papers_list.md` exactly (title, author, year).
+- Confirm it is cited in the correct section context.
+- Confirm the APA reference entry at the end is correctly formatted.
+List any mismatches, missing references, or formatting errors. Fix all issues in `REVIEW_CONTENT.md` before proceeding.
 ```
 
 ---
 
-## Stage 4: DOCX Generation
+## Stage 3: Pre-Export Quality Check & DOCX Generation
+
+**Goal:** Ensure the document perfectly matches university formatting and export it to DOCX.
+
+**Copy this prompt:**
 
 ```text
-I now have the fully compiled markdown file `REVIEW_CONTENT.md`.
+Before generating the DOCX script, verify the following against `templates/review_paper_format_guide.md`:
+- [ ] Title is 24pt Bold, Centered, Title Case
+- [ ] Authors are in a 3-column borderless table
+- [ ] Abstract follows the 6-point structure with inline bold label + em-dash
+- [ ] Keywords: exactly 5–7, Title Case
+- [ ] Introduction has exactly 3 paragraphs
+- [ ] Literature Review has exactly {PAPER_COUNT} paragraphs, each ending with a citation
+- [ ] Comparison table has 7 columns and 5 rows
+- [ ] Conclusion has exactly 3 paragraphs
+- [ ] References are APA format, numbered [1]–[{PAPER_COUNT}]
+- [ ] Word count of Future Scope section is approximately 150 words
+Report any failures. Fix them in `REVIEW_CONTENT.md` before proceeding.
 
-Please read `skills/docx_generator/SKILL.md` to understand how to generate DOCX files.
+I now have the fully audited and formatted markdown file `REVIEW_CONTENT.md`.
 
-Write a complete Node.js script using the `docx` npm library that contains all my content from `REVIEW_CONTENT.md` and generates a professionally formatted DOCX file.
+You have three options for generating the final DOCX file. Choose ONE based on my environment:
 
-The script MUST enforce these formatting rules:
+**Option A (Node.js):**
+Write a complete Node.js script using the `docx` npm library. Read `skills/docx_generator/SKILL.md` to ensure correct usage. Name the script `generate_docx.js`.
+Then tell me to run: `npm install docx && node generate_docx.js`
+
+**Option B (Python):**
+Write a complete Python script using the `python-docx` library. Name the script `generate_docx.py`.
+Then tell me to run: `pip install python-docx && python generate_docx.py`
+
+**Option C (Pandoc):**
+Provide the exact Pandoc CLI command to convert `REVIEW_CONTENT.md` directly into `{OUTPUT_FILENAME}.docx`.
+
+No matter which option you take, the output MUST enforce these formatting rules:
 - Font: Times New Roman throughout
 - Title: 24pt Bold, Centered
 - Body text: 12pt
@@ -180,28 +235,13 @@ The script MUST enforce these formatting rules:
 - Header: Running title (italics, right-aligned)
 - Footer: "Page X of Y" (centered)
 - References: Hanging indent, 10pt font
-- Page breaks before major sections where appropriate
 
-Name the script `generate_docx.js`.
-
-After creating the script, tell me to run:
-npm install docx
-node generate_docx.js
+I prefer Option [CHOOSE A, B, or C].
 ```
 
 ---
 
 ## Troubleshooting
-
-### "Cannot find module 'docx'"
-Run `npm install docx` in the same directory as your `generate_docx.js` script.
-
-### "Cannot find module" with wrong path
-On Windows, use the full path: `node D:\path\to\generate_docx.js`
-Or switch drives first: `D: && cd \folder && node generate_docx.js`
-
-### AI loses context mid-workflow
-This is why the workflow is batched. If the AI forgets the format rules, re-paste the instruction to read `review_paper_format_guide.md` and `humanizer/SKILL.md` at the start of your next prompt.
 
 ### Generated text sounds too "AI"
 Re-run the specific section with this additional instruction appended:
