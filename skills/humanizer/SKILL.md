@@ -66,6 +66,24 @@ Always refer to this table to understand exactly what each AI pattern looks like
 | 28 | Signposting announcements | Let's dive into how caching works. Let's explore the process. Here's what you need to know. | Next.js caches data at multiple layers, including request memoization and the router cache. |
 | 29 | Fragmented headers | ## Performance<br><br>Speed matters.<br><br>When users hit a slow page, they leave. | ## Performance<br><br>When users hit a slow page, they leave. |
 
+
+## Advanced Evasion: Beating AI Detectors (Perplexity & Burstiness)
+
+AI detectors (like Turnitin, Winston AI, or GPTZero) do not just look for the 29 vocabulary patterns above. They rely heavily on two mathematical metrics: **Perplexity** (how predictable the vocabulary is) and **Burstiness** (structural uniformity). 
+
+To lower an AI detection score from 80%+ down to <10%, you **MUST** intentionally disrupt both metrics across the entire document:
+
+1. **Inject High Burstiness (Radical Length Variation):** AI writes in highly uniform, symmetric sentences (usually 14-20 words each). To break this, you must construct paragraphs with jarring length disparities.
+   * *AI Rhythm:* Sentence (15 words). Sentence (18 words). Sentence (14 words). Sentence (16 words).
+   * *Human Rhythm:* Sentence (6 words). Sentence (32 words featuring multiple clauses, an em-dash, and a compound structure). Sentence (4 words). Sentence (15 words).
+   * **Rule:** Every single paragraph MUST contain at least one extremely short punchy sentence (under 8 words) and one very long, multi-clause sentence.
+
+2. **Increase Perplexity (Break Logical Predictability):** AI heavily relies on mathematical predictability and standard transition words ("Therefore," "Furthermore," "In addition," "Because of this").
+   * **Action:** Strip out standard transition words entirely. Force sentences to start abruptly with the primary subject or an unusual dependent clause. 
+   * **Action:** Swap highly predictable academic verbs ("used," "showed," "created") for slightly asymmetrical but accurate alternatives ("leveraged," "demonstrated," "architected").
+
+3. **Break the "Topic + Elaborate + Conclude" Formula:** AI rigidly adheres to high-school paragraph structures where every paragraph perfectly self-wraps. Humans bleed thoughts across paragraphs. End paragraphs on a cliffhanger piece of data, or start the next paragraph immediately with the action.
+
 ---
 
 ## Process
